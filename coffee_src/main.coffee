@@ -54,14 +54,41 @@ class Main
 		@add_block_with_padding(x, y, z, w, h, d, 0)
 
 	add_block_with_padding: (x, y, z, w, h, d, p) ->
-		cube = new THREE.Mesh(
-			new THREE.BoxGeometry w-p, h-p, d-p
-			new THREE.MeshBasicMaterial {color: @next_colour(), wireframe: true}
-		)
-		cube.position.x = x
-		cube.position.y = y
-		cube.position.z = z
-		@scene.add cube
+
+		tmp = new THREE.BoxGeometry w-p, h-p, d-p
+		rcol = @next_colour()
+
+		g = new THREE.Geometry()
+		g.vertices.push tmp.vertices[1]
+		g.vertices.push tmp.vertices[4]
+		g.vertices.push tmp.vertices[6]
+		g.vertices.push tmp.vertices[3]
+		g.vertices.push tmp.vertices[2]
+		g.vertices.push tmp.vertices[0]
+		g.vertices.push tmp.vertices[1]
+		g.vertices.push tmp.vertices[3]
+
+		side1 = new THREE.Line g, new THREE.LineBasicMaterial {color: rcol}
+		side1.position.x = x
+		side1.position.y = y
+		side1.position.z = z
+		@scene.add side1
+
+		g = new THREE.Geometry()
+		g.vertices.push tmp.vertices[5]
+		g.vertices.push tmp.vertices[7]
+		g.vertices.push tmp.vertices[2]
+		g.vertices.push tmp.vertices[0]
+		g.vertices.push tmp.vertices[5]
+		g.vertices.push tmp.vertices[4]
+		g.vertices.push tmp.vertices[6]
+		g.vertices.push tmp.vertices[7]
+		
+		side2 = new THREE.Line g, new THREE.LineBasicMaterial {color: rcol}
+		side2.position.x = x
+		side2.position.y = y
+		side2.position.z = z
+		@scene.add side2
 
 	add_block_by_bounds: (sx, sy, sz, ex, ey, ez) ->
 		@add_block(

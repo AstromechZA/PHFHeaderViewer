@@ -32,15 +32,15 @@
     }
 
     Main.prototype.build_scene = function() {
-      this.add_block_m(0, 0, 0, 4, 4, 4, 0);
-      this.add_block_m(1, 1, 1, 2, 2, 2, 0.1);
-      this.add_block_m(1, 1, -1, 2, 2, 2, 0.1);
-      this.add_block_m(1, -1, 1, 2, 2, 2, 0.1);
-      this.add_block_m(1, -1, -1, 2, 2, 2, 0.1);
-      this.add_block_m(-1, 1, 1, 2, 2, 2, 0.1);
-      this.add_block_m(-1, 1, -1, 2, 2, 2, 0.1);
-      this.add_block_m(-1, -1, 1, 2, 2, 2, 0.1);
-      return this.add_block_m(-1, -1, -1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(0, 0, 0, 4, 4, 4, 0);
+      this.add_block_with_padding(1, 1, 1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(1, 1, -1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(1, -1, 1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(1, -1, -1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(-1, 1, 1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(-1, 1, -1, 2, 2, 2, 0.1);
+      this.add_block_with_padding(-1, -1, 1, 2, 2, 2, 0.1);
+      return this.add_block_with_padding(-1, -1, -1, 2, 2, 2, 0.1);
     };
 
     Main.prototype.animate = function() {
@@ -58,19 +58,45 @@
     };
 
     Main.prototype.add_block = function(x, y, z, w, h, d) {
-      return this.add_block_m(x, y, z, w, h, d, 0);
+      return this.add_block_with_padding(x, y, z, w, h, d, 0);
     };
 
-    Main.prototype.add_block_m = function(x, y, z, w, h, d, m) {
-      var cube;
-      cube = new THREE.Mesh(new THREE.BoxGeometry(w - m, h - m, d - m), new THREE.MeshBasicMaterial({
-        color: this.next_colour(),
-        wireframe: true
+    Main.prototype.add_block_with_padding = function(x, y, z, w, h, d, p) {
+      var g, rcol, side1, side2, tmp;
+      tmp = new THREE.BoxGeometry(w - p, h - p, d - p);
+      rcol = this.next_colour();
+      g = new THREE.Geometry();
+      g.vertices.push(tmp.vertices[1]);
+      g.vertices.push(tmp.vertices[4]);
+      g.vertices.push(tmp.vertices[6]);
+      g.vertices.push(tmp.vertices[3]);
+      g.vertices.push(tmp.vertices[2]);
+      g.vertices.push(tmp.vertices[0]);
+      g.vertices.push(tmp.vertices[1]);
+      g.vertices.push(tmp.vertices[3]);
+      side1 = new THREE.Line(g, new THREE.LineBasicMaterial({
+        color: rcol
       }));
-      cube.position.x = x;
-      cube.position.y = y;
-      cube.position.z = z;
-      return this.scene.add(cube);
+      side1.position.x = x;
+      side1.position.y = y;
+      side1.position.z = z;
+      this.scene.add(side1);
+      g = new THREE.Geometry();
+      g.vertices.push(tmp.vertices[5]);
+      g.vertices.push(tmp.vertices[7]);
+      g.vertices.push(tmp.vertices[2]);
+      g.vertices.push(tmp.vertices[0]);
+      g.vertices.push(tmp.vertices[5]);
+      g.vertices.push(tmp.vertices[4]);
+      g.vertices.push(tmp.vertices[6]);
+      g.vertices.push(tmp.vertices[7]);
+      side2 = new THREE.Line(g, new THREE.LineBasicMaterial({
+        color: rcol
+      }));
+      side2.position.x = x;
+      side2.position.y = y;
+      side2.position.z = z;
+      return this.scene.add(side2);
     };
 
     Main.prototype.add_block_by_bounds = function(sx, sy, sz, ex, ey, ez) {
