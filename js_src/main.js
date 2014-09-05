@@ -14,34 +14,27 @@
 
     Main.prototype.last_colour = 0;
 
-    function Main(target) {
+    function Main(target, content) {
       this.render = __bind(this.render, this);
       this.animate = __bind(this.animate, this);
+      var block, _i, _len;
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(75, viewport_width / viewport_height, 0.1, 1000);
+      this.camera = new THREE.PerspectiveCamera(55, viewport_width / viewport_height, 0.1, 10000);
       this.camera.position.z = 5;
       this.renderer = new THREE.WebGLRenderer();
+      this.renderer.setClearColor(0xffffff, 1);
       this.renderer.setSize(viewport_width, viewport_height);
       this.controls = new THREE.OrbitControls(this.camera);
       this.controls.damping = 0.2;
       this.controls.addEventListener('change', this.render);
-      this.build_scene();
+      for (_i = 0, _len = content.length; _i < _len; _i++) {
+        block = content[_i];
+        this.add_block_by_bounds(block.min_x, block.min_z, block.min_y, block.max_x, block.max_z, block.max_y);
+      }
       target.appendChild(this.renderer.domElement);
       this.animate();
       this.render();
     }
-
-    Main.prototype.build_scene = function() {
-      this.add_block_with_padding(0, 0, 0, 4, 4, 4, 0);
-      this.add_block_with_padding(1, 1, 1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(1, 1, -1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(1, -1, 1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(1, -1, -1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(-1, 1, 1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(-1, 1, -1, 2, 2, 2, 0.1);
-      this.add_block_with_padding(-1, -1, 1, 2, 2, 2, 0.1);
-      return this.add_block_with_padding(-1, -1, -1, 2, 2, 2, 0.1);
-    };
 
     Main.prototype.animate = function() {
       requestAnimationFrame(this.animate);
@@ -58,12 +51,8 @@
     };
 
     Main.prototype.add_block = function(x, y, z, w, h, d) {
-      return this.add_block_with_padding(x, y, z, w, h, d, 0);
-    };
-
-    Main.prototype.add_block_with_padding = function(x, y, z, w, h, d, p) {
       var g, rcol, side1, side2, tmp;
-      tmp = new THREE.BoxGeometry(w - p, h - p, d - p);
+      tmp = new THREE.BoxGeometry(w, h, d);
       rcol = this.next_colour();
       g = new THREE.Geometry();
       g.vertices.push(tmp.vertices[1]);
@@ -108,8 +97,16 @@
   })();
 
   $(function() {
-    var main;
-    return main = new Main(document.body);
+    var button_1, text_area_1;
+    text_area_1 = $('#textarea1')[0];
+    button_1 = $('#button1')[0];
+    return $(button_1).click(function() {
+      var main, o;
+      o = JSON.parse(text_area_1.value);
+      main = new Main(document.body, o);
+      $(button_1).remove();
+      return $(text_area_1).remove();
+    });
   });
 
 }).call(this);
