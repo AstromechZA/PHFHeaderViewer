@@ -28,16 +28,16 @@ class Main
 		@render()
 
 	build_scene: ->
-		@add_block_m(0, 0, 0, 4, 4, 4, 0)
-		@add_block_m(1, 1, 1, 2, 2, 2, 0.1)
-		@add_block_m(1, 1, -1, 2, 2, 2, 0.1)
-		@add_block_m(1, -1, 1, 2, 2, 2, 0.1)
-		@add_block_m(1, -1, -1, 2, 2, 2, 0.1)
+		@add_block_with_padding(0, 0, 0, 4, 4, 4, 0)
+		@add_block_with_padding(1, 1, 1, 2, 2, 2, 0.1)
+		@add_block_with_padding(1, 1, -1, 2, 2, 2, 0.1)
+		@add_block_with_padding(1, -1, 1, 2, 2, 2, 0.1)
+		@add_block_with_padding(1, -1, -1, 2, 2, 2, 0.1)
 
-		@add_block_m(-1, 1, 1, 2, 2, 2, 0.1)
-		@add_block_m(-1, 1, -1, 2, 2, 2, 0.1)
-		@add_block_m(-1, -1, 1, 2, 2, 2, 0.1)
-		@add_block_m(-1, -1, -1, 2, 2, 2, 0.1)
+		@add_block_with_padding(-1, 1, 1, 2, 2, 2, 0.1)
+		@add_block_with_padding(-1, 1, -1, 2, 2, 2, 0.1)
+		@add_block_with_padding(-1, -1, 1, 2, 2, 2, 0.1)
+		@add_block_with_padding(-1, -1, -1, 2, 2, 2, 0.1)
 
 	animate: =>
 		requestAnimationFrame @animate
@@ -51,11 +51,11 @@ class Main
 		@colours[@last_colour]
 
 	add_block: (x, y, z, w, h, d) ->
-		@add_block_m(x, y, z, w, h, d, 0)
+		@add_block_with_padding(x, y, z, w, h, d, 0)
 
-	add_block_m: (x, y, z, w, h, d, m) ->
+	add_block_with_padding: (x, y, z, w, h, d, p) ->
 		cube = new THREE.Mesh(
-			new THREE.BoxGeometry w-m, h-m, d-m
+			new THREE.BoxGeometry w-p, h-p, d-p
 			new THREE.MeshBasicMaterial {color: @next_colour(), wireframe: true}
 		)
 		cube.position.x = x
