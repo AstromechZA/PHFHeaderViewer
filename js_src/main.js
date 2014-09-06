@@ -63,40 +63,35 @@
     };
 
     Main.prototype.add_block = function(x, y, z, w, h, d) {
-      var g, rcol, side1, side2, tmp;
+      var g1, g2, material, rcol, side1, side2, tmp;
       tmp = new THREE.BoxGeometry(w, h, d);
       rcol = this.next_colour();
-      g = new THREE.Geometry();
-      g.vertices.push(tmp.vertices[1]);
-      g.vertices.push(tmp.vertices[4]);
-      g.vertices.push(tmp.vertices[6]);
-      g.vertices.push(tmp.vertices[3]);
-      g.vertices.push(tmp.vertices[2]);
-      g.vertices.push(tmp.vertices[0]);
-      g.vertices.push(tmp.vertices[1]);
-      g.vertices.push(tmp.vertices[3]);
-      side1 = new THREE.Line(g, new THREE.LineBasicMaterial({
+      material = new THREE.LineBasicMaterial({
         color: rcol
-      }));
-      side1.position.x = x;
-      side1.position.y = y;
-      side1.position.z = z;
+      });
+      g1 = new THREE.Geometry();
+      g1.vertices.push(tmp.vertices[1]);
+      g1.vertices.push(tmp.vertices[4]);
+      g1.vertices.push(tmp.vertices[6]);
+      g1.vertices.push(tmp.vertices[3]);
+      g1.vertices.push(tmp.vertices[2]);
+      g1.vertices.push(tmp.vertices[0]);
+      g1.vertices.push(tmp.vertices[1]);
+      g1.vertices.push(tmp.vertices[3]);
+      side1 = new THREE.Line(g1, material);
+      side1.position.set(x, y, z);
       this.scene.add(side1);
-      g = new THREE.Geometry();
-      g.vertices.push(tmp.vertices[5]);
-      g.vertices.push(tmp.vertices[7]);
-      g.vertices.push(tmp.vertices[2]);
-      g.vertices.push(tmp.vertices[0]);
-      g.vertices.push(tmp.vertices[5]);
-      g.vertices.push(tmp.vertices[4]);
-      g.vertices.push(tmp.vertices[6]);
-      g.vertices.push(tmp.vertices[7]);
-      side2 = new THREE.Line(g, new THREE.LineBasicMaterial({
-        color: rcol
-      }));
-      side2.position.x = x;
-      side2.position.y = y;
-      side2.position.z = z;
+      g2 = new THREE.Geometry();
+      g2.vertices.push(tmp.vertices[5]);
+      g2.vertices.push(tmp.vertices[7]);
+      g2.vertices.push(tmp.vertices[2]);
+      g2.vertices.push(tmp.vertices[0]);
+      g2.vertices.push(tmp.vertices[5]);
+      g2.vertices.push(tmp.vertices[4]);
+      g2.vertices.push(tmp.vertices[6]);
+      g2.vertices.push(tmp.vertices[7]);
+      side2 = new THREE.Line(g2, material);
+      side2.position.set(x, y, z);
       return this.scene.add(side2);
     };
 
@@ -109,15 +104,11 @@
   })();
 
   $(function() {
-    var button_1, text_area_1;
-    text_area_1 = $('#textarea1')[0];
-    button_1 = $('#button1')[0];
-    return $(button_1).click(function() {
+    return $('#button1').click(function() {
       var main, o;
-      o = JSON.parse(text_area_1.value);
+      o = JSON.parse($('#textarea1')[0].value);
       main = new Main(document.body, o);
-      $(button_1).remove();
-      return $(text_area_1).remove();
+      return $('#interface1').remove();
     });
   });
 

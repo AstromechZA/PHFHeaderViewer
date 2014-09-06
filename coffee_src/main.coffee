@@ -63,55 +63,49 @@ class Main
 	add_block: (x, y, z, w, h, d) ->
 		tmp = new THREE.BoxGeometry w, h, d
 		rcol = @next_colour()
+		material = new THREE.LineBasicMaterial {color: rcol}
 
-		g = new THREE.Geometry()
-		g.vertices.push tmp.vertices[1]
-		g.vertices.push tmp.vertices[4]
-		g.vertices.push tmp.vertices[6]
-		g.vertices.push tmp.vertices[3]
-		g.vertices.push tmp.vertices[2]
-		g.vertices.push tmp.vertices[0]
-		g.vertices.push tmp.vertices[1]
-		g.vertices.push tmp.vertices[3]
+		g1 = new THREE.Geometry()
+		g1.vertices.push tmp.vertices[1]
+		g1.vertices.push tmp.vertices[4]
+		g1.vertices.push tmp.vertices[6]
+		g1.vertices.push tmp.vertices[3]
+		g1.vertices.push tmp.vertices[2]
+		g1.vertices.push tmp.vertices[0]
+		g1.vertices.push tmp.vertices[1]
+		g1.vertices.push tmp.vertices[3]
 
-		side1 = new THREE.Line g, new THREE.LineBasicMaterial {color: rcol}
-		side1.position.x = x
-		side1.position.y = y
-		side1.position.z = z
+		side1 = new THREE.Line g1, material
+		side1.position.set x, y, z
 		@scene.add side1
 
-		g = new THREE.Geometry()
-		g.vertices.push tmp.vertices[5]
-		g.vertices.push tmp.vertices[7]
-		g.vertices.push tmp.vertices[2]
-		g.vertices.push tmp.vertices[0]
-		g.vertices.push tmp.vertices[5]
-		g.vertices.push tmp.vertices[4]
-		g.vertices.push tmp.vertices[6]
-		g.vertices.push tmp.vertices[7]
+		g2 = new THREE.Geometry()
+		g2.vertices.push tmp.vertices[5]
+		g2.vertices.push tmp.vertices[7]
+		g2.vertices.push tmp.vertices[2]
+		g2.vertices.push tmp.vertices[0]
+		g2.vertices.push tmp.vertices[5]
+		g2.vertices.push tmp.vertices[4]
+		g2.vertices.push tmp.vertices[6]
+		g2.vertices.push tmp.vertices[7]
 		
-		side2 = new THREE.Line g, new THREE.LineBasicMaterial {color: rcol}
-		side2.position.x = x
-		side2.position.y = y
-		side2.position.z = z
+		side2 = new THREE.Line g2, material
+		side2.position.set x, y, z
 		@scene.add side2
 
 	add_block_by_bounds: (sx, sy, sz, ex, ey, ez) ->
 		@add_block(
-			(sx+ex)/2
-			(sy+ey)/2
-			(sz+ez)/2
+			(sx + ex) / 2
+			(sy + ey) / 2
+			(sz + ez) / 2
 			ex-sx
 			ey-sy
 			ez-sz
 		)
 
 $ ->
-	text_area_1 = $('#textarea1')[0]
-	button_1 = $('#button1')[0]
-	$(button_1).click ->
-		o = JSON.parse text_area_1.value
-		main = new Main(document.body, o)
-		$(button_1).remove()
-		$(text_area_1).remove()
+	$('#button1').click ->
+		o = JSON.parse $('#textarea1')[0].value
+		main = new Main document.body, o
+		$('#interface1').remove()
 
