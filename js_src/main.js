@@ -21,33 +21,28 @@
     function Main(target, content) {
       this.render = __bind(this.render, this);
       this.animate = __bind(this.animate, this);
-      var bd, bh, block, bw, fd, fex, fey, fez, fh, first_block, fsx, fsy, fsz, fw, _i, _len;
+      var bd, bh, block, bw, fd, fh, first_block, fw, _i, _len;
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(55, viewport_width / viewport_height, 0.1, 10000);
-      this.camera.position.z = 10;
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setClearColor(0xffffff, 1);
       this.renderer.setSize(viewport_width, viewport_height);
-      this.controls = new THREE.OrbitControls(this.camera);
-      this.controls.damping = 0.2;
-      this.controls.addEventListener('change', this.render);
       first_block = content[0];
-      fsx = first_block.min_x;
-      fsy = first_block.min_y;
-      fsz = first_block.min_z;
-      fex = first_block.max_x;
-      fey = first_block.max_y;
-      fez = first_block.max_z;
-      fw = fex - fsx;
-      fh = fey - fsy;
-      fd = fez - fsz;
+      fw = first_block.max_x - first_block.min_x;
+      fh = first_block.max_y - first_block.min_y;
+      fd = first_block.max_z - first_block.min_z;
       for (_i = 0, _len = content.length; _i < _len; _i++) {
         block = content[_i];
         bw = log2(fw / (block.max_x - block.min_x));
         bh = log2(fh / (block.max_y - block.min_y));
         bd = log2(fd / (block.max_z - block.min_z));
-        this.add_block_by_bounds(block.min_x + bw * 2, block.min_z + bd * 2, block.min_y + bh * 2, block.max_x - bw * 2, block.max_z - bd * 2, block.max_y - bh * 2);
+        this.add_block_by_bounds(block.min_x + bw * 2, block.min_y + bh * 2, block.min_z + bd * 2, block.max_x - bw * 2, block.max_y - bh * 2, block.max_z - bd * 2);
       }
+      this.camera = new THREE.PerspectiveCamera(55, viewport_width / viewport_height, 0.1, 10000);
+      this.camera.position.set(fw, fh, fd);
+      this.camera.up = new THREE.Vector3(0, 0, 1);
+      this.controls = new THREE.OrbitControls(this.camera);
+      this.controls.damping = 0.2;
+      this.controls.addEventListener('change', this.render);
       target.appendChild(this.renderer.domElement);
       this.animate();
       this.render();
