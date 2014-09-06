@@ -1,6 +1,9 @@
 viewport_width = 800
 viewport_height = 600
 
+log2 = (x) ->
+	Math.log(x) / Math.LN2
+
 class Main
 	
 	margin: 0.05
@@ -11,7 +14,15 @@ class Main
 		@scene = new THREE.Scene()
 		
 		@camera = new THREE.PerspectiveCamera 55, viewport_width/viewport_height, 0.1, 10000
-		@camera.position.z = 5
+		#@camera = new THREE.OrthographicCamera( 
+		#	viewport_width / - 2 
+		#	viewport_width / 2 
+		#	viewport_height / 2 
+		#	viewport_height / - 2 
+		#	0.1 
+		#	10000 
+		#)
+		@camera.position.z = 10
 
 		@renderer = new THREE.WebGLRenderer()
 		@renderer.setClearColor 0xffffff, 1
@@ -21,14 +32,29 @@ class Main
 		@controls.damping = 0.2
 		@controls.addEventListener 'change', @render
 
+		first_block = content[0]
+		fsx = first_block.min_x
+		fsy = first_block.min_y
+		fsz = first_block.min_z
+		fex = first_block.max_x
+		fey = first_block.max_y
+		fez = first_block.max_z
+		fw = fex-fsx
+		fh = fey-fsy
+		fd = fez-fsz
+
 		for block in content
+			bw = log2 fw/(block.max_x - block.min_x)
+			bh = log2 fh/(block.max_y - block.min_y)
+			bd = log2 fd/(block.max_z - block.min_z)
+
 			@add_block_by_bounds(
-				block.min_x
-				block.min_z
-				block.min_y
-				block.max_x
-				block.max_z
-				block.max_y
+				block.min_x+bw*2
+				block.min_z+bd*2
+				block.min_y+bh*2
+				block.max_x-bw*2
+				block.max_z-bd*2
+				block.max_y-bh*2
 			)
 
 		target.appendChild @renderer.domElement
