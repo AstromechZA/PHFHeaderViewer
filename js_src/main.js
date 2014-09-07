@@ -18,27 +18,22 @@
 
     Main.prototype.last_colour = 0;
 
-    function Main(target, content) {
+    function Main(target, content, options) {
       this.render = __bind(this.render, this);
       this.animate = __bind(this.animate, this);
-      var bd, bh, block, bw, fd, fh, first_block, fw, _i, _len;
+      var cam_pos;
+      this.options = $.extend({
+        swap_yz: false
+      }, options || {});
       this.scene = new THREE.Scene();
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setClearColor(0xffffff, 1);
       this.renderer.setSize(viewport_width, viewport_height);
-      first_block = content[0];
-      fw = first_block.max_x - first_block.min_x;
-      fh = first_block.max_y - first_block.min_y;
-      fd = first_block.max_z - first_block.min_z;
-      for (_i = 0, _len = content.length; _i < _len; _i++) {
-        block = content[_i];
-        bw = log2(fw / (block.max_x - block.min_x));
-        bh = log2(fh / (block.max_y - block.min_y));
-        bd = log2(fd / (block.max_z - block.min_z));
-        this.add_block_by_bounds(block.min_x + bw * 2, block.min_y + bh * 2, block.min_z + bd * 2, block.max_x - bw * 2, block.max_y - bh * 2, block.max_z - bd * 2);
-      }
+      cam_pos = this.build_scene(content);
       this.camera = new THREE.PerspectiveCamera(55, viewport_width / viewport_height, 0.1, 10000);
-      this.camera.position.set(fw, fh, fd);
+      this.camera.position.x = cam_pos[0];
+      this.camera.position.y = cam_pos[1];
+      this.camera.position.z = cam_pos[2];
       this.camera.up = new THREE.Vector3(0, 0, 1);
       this.controls = new THREE.OrbitControls(this.camera);
       this.controls.damping = 0.2;
@@ -55,6 +50,29 @@
 
     Main.prototype.render = function() {
       return this.renderer.render(this.scene, this.camera);
+    };
+
+    Main.prototype.build_scene = function(blocks) {
+      var bd, bh, block, bw, fd, fh, first_block, fw, _i, _len;
+      if (blocks.length > 0) {
+        first_block = blocks[0];
+        fw = first_block.max_x - first_block.min_x;
+        fh = first_block.max_y - first_block.min_y;
+        fd = first_block.max_z - first_block.min_z;
+        for (_i = 0, _len = blocks.length; _i < _len; _i++) {
+          block = blocks[_i];
+          bw = log2(fw / (block.max_x - block.min_x));
+          bh = log2(fh / (block.max_y - block.min_y));
+          bd = log2(fd / (block.max_z - block.min_z));
+          if (this.options.swap_yz) {
+            this.add_block_by_bounds(block.min_x + bw * 2, block.min_z + bd * 2, block.min_y + bh * 2, block.max_x - bw * 2, block.max_z - bd * 2, block.max_y - bh * 2);
+          } else {
+            this.add_block_by_bounds(block.min_x + bw * 2, block.min_y + bh * 2, block.min_z + bd * 2, block.max_x - bw * 2, block.max_y - bh * 2, block.max_z - bd * 2);
+          }
+        }
+        return [fw, fh, fd];
+      }
+      return [1, 1, 1];
     };
 
     Main.prototype.next_colour = function() {
@@ -105,9 +123,12 @@
 
   $(function() {
     return $('#button1').click(function() {
-      var main, o;
+      var main, o, v;
       o = JSON.parse($('#textarea1')[0].value);
-      main = new Main(document.body, o);
+      v = $('#checkbox1')[0].checked;
+      main = new Main(document.body, o, {
+        swap_yz: v
+      });
       return $('#interface1').remove();
     });
   });

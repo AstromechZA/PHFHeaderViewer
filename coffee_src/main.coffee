@@ -10,34 +10,26 @@ class Main
 	colours: [0x19ff00, 0x00ff65, 0x0098ff, 0x6500ff, 0xe500ff]
 	last_colour: 0
 
-	constructor: (target, content) ->
+	constructor: (target, content, options) ->
+		@options = $.extend(
+			{
+				swap_yz: false
+			}
+			options || {}
+		)
+
 		@scene = new THREE.Scene()
 
 		@renderer = new THREE.WebGLRenderer()
 		@renderer.setClearColor 0xffffff, 1
 		@renderer.setSize viewport_width, viewport_height
 
-		first_block = content[0]
-		fw = first_block.max_x-first_block.min_x
-		fh = first_block.max_y-first_block.min_y
-		fd = first_block.max_z-first_block.min_z
-
-		for block in content
-			bw = log2 fw / (block.max_x - block.min_x)
-			bh = log2 fh / (block.max_y - block.min_y)
-			bd = log2 fd / (block.max_z - block.min_z)
-
-			@add_block_by_bounds(
-				block.min_x + bw * 2
-				block.min_y + bh * 2
-				block.min_z + bd * 2
-				block.max_x - bw * 2
-				block.max_y - bh * 2
-				block.max_z - bd * 2
-			)
+		cam_pos = @build_scene(content)
 
 		@camera = new THREE.PerspectiveCamera 55, viewport_width/viewport_height, 0.1, 10000
-		@camera.position.set fw, fh, fd
+		@camera.position.x = cam_pos[0]
+		@camera.position.y = cam_pos[1]
+		@camera.position.z = cam_pos[2]
 		@camera.up = new THREE.Vector3 0, 0, 1
 
 		@controls = new THREE.OrbitControls @camera
@@ -55,6 +47,39 @@ class Main
 
 	render: =>
 		@renderer.render @scene, @camera
+
+	build_scene: (blocks) ->
+		if blocks.length > 0
+			first_block = blocks[0]
+			fw = first_block.max_x-first_block.min_x
+			fh = first_block.max_y-first_block.min_y
+			fd = first_block.max_z-first_block.min_z
+
+			for block in blocks
+				bw = log2 fw / (block.max_x - block.min_x)
+				bh = log2 fh / (block.max_y - block.min_y)
+				bd = log2 fd / (block.max_z - block.min_z)
+
+				if @options.swap_yz
+					@add_block_by_bounds(
+						block.min_x + bw * 2
+						block.min_z + bd * 2
+						block.min_y + bh * 2
+						block.max_x - bw * 2
+						block.max_z - bd * 2
+						block.max_y - bh * 2
+					)
+				else
+					@add_block_by_bounds(
+						block.min_x + bw * 2
+						block.min_y + bh * 2
+						block.min_z + bd * 2
+						block.max_x - bw * 2
+						block.max_y - bh * 2
+						block.max_z - bd * 2
+					)
+			return [fw, fh, fd]
+		return [1, 1, 1]
 
 	next_colour: ->
 		@last_colour = (@last_colour + 1) % @colours.length
@@ -106,6 +131,7 @@ class Main
 $ ->
 	$('#button1').click ->
 		o = JSON.parse $('#textarea1')[0].value
-		main = new Main document.body, o
+		v = $('#checkbox1')[0].checked
+		main = new Main document.body, o, {swap_yz: v}
 		$('#interface1').remove()
 
