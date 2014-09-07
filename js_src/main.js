@@ -65,7 +65,7 @@
           bh = log2(fh / (block.max_y - block.min_y));
           bd = log2(fd / (block.max_z - block.min_z));
           if (this.options.swap_yz) {
-            this.add_block_by_bounds(block.min_x + bw * 2, block.min_z + bd * 2, block.min_y + bh * 2, block.max_x - bw * 2, block.max_z - bd * 2, block.max_y - bh * 2);
+            this.add_block_by_bounds(block.min_x + bw * 2, -(block.max_z - bd * 2), block.min_y + bh * 2, block.max_x - bw * 2, -(block.min_z + bd * 2), block.max_y - bh * 2);
           } else {
             this.add_block_by_bounds(block.min_x + bw * 2, block.min_y + bh * 2, block.min_z + bd * 2, block.max_x - bw * 2, block.max_y - bh * 2, block.max_z - bd * 2);
           }

@@ -63,10 +63,10 @@ class Main
 				if @options.swap_yz
 					@add_block_by_bounds(
 						block.min_x + bw * 2
-						block.min_z + bd * 2
+						-(block.max_z - bd * 2)
 						block.min_y + bh * 2
 						block.max_x - bw * 2
-						block.max_z - bd * 2
+						-(block.min_z + bd * 2)
 						block.max_y - bh * 2
 					)
 				else
