@@ -233,8 +233,12 @@
       });
     });
     return $('#button2').click(function() {
-      return $.get('sample.json', function(data) {
-        return $('#textarea1')[0].value = data;
+      return $.ajax('sample.json', {
+        type: 'GET',
+        dataType: 'text',
+        success: function(data, textStatus, jqXHR) {
+          return $('#textarea1')[0].value = data;
+        }
       });
     });
   });

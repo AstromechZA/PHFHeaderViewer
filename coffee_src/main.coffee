@@ -213,7 +213,10 @@ $ ->
 		main = new Main t, tree, {swap_yz: v}
 
 	$('#button2').click ->
-		$.get 'sample.json', (data) ->
-			$('#textarea1')[0].value = data
+		$.ajax 'sample.json', 
+			type: 'GET', 
+			dataType: 'text',
+			success: (data, textStatus, jqXHR) ->
+				$('#textarea1')[0].value = data
 
 
