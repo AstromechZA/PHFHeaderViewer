@@ -1,27 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<title>PHF Header Viewer</title>
 	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 </head>
 <body>
 	<style type="text/css">
-
-		canvas {
-			border: 1px solid #888;
+		body {
+			background-color: #eee;
 		}
-
+		canvas {
+			border: 1px solid #aaa;
+		}
 	</style>
-	<div id='interface1'>
-		<textarea id='textarea1' rows="5" cols="50"></textarea>
-		<br />
-		<input id='checkbox1' type="checkbox", value="swap_yz">Swap YZ axes</input>
-		<input id='button1' type='button' value='GO'></input>
+	<div class="container">
+		<br>
+		<div class="row" id='interface1'>
+  			<div class="col-md-6 col-md-offset-3">
+  				<div class="panel panel-default">
+  					<div class="panel-heading">
+  						New View
+  					</div>
+  					<div class="panel-body">
+						<textarea id='textarea1' class="form-control" rows="5" cols="50" placeholder="Enter Tree JSON here..."></textarea>
+						<input id='button2' class="btn btn-xs btn-default" type='button' value='Load Sample Data'></input>
+						<div class="checkbox">
+							<label>
+								<input id='checkbox1' type="checkbox", value="swap_yz">Swap YZ axes</input>
+							</label>
+						</div>
+						<input id='button1' class="btn btn-block btn-success" type='button' value='GO'></input>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row interface_2_row" style="display: none">
+			<div class="col-md-12">
+				<div class="panel panel-default">
+  					<div class="panel-heading">
+  						3D View
+  					</div>
+  					<div id="canvas_target" class="panel-body">
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row interface_2_row" style="display: none">
+			<div class="col-md-4">
+				<div class="panel panel-default">
+  					<div class="panel-heading">
+  						Tree Stats
+  					</div>
+					<table id="stats_target" class="table table-condensed">
+					</table>
+				</div>
+			</div>
+		</div>
 	</div>
 
-	<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
-	<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js'></script>
-	<script type='text/javascript' src='libs/OrbitControls.js'></script>
-	<script type='text/javascript' src='js_src/main.js'></script>
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js'></script>
+<script type='text/javascript' src='libs/OrbitControls.js'></script>
+<script type='text/javascript' src='js_src/main.js'></script>
 </body>
 </html>
