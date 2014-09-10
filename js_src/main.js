@@ -87,25 +87,34 @@
     };
 
     Main.prototype.build_scene = function() {
-      var bd, bh, bw, fd, fh, fw, node, q, root;
+      var f, fd, fh, fw, gradient, root;
+      gradient = [0xE50400, 0xE10056, 0xDD00AE, 0xAF00D9, 0x5500D5, 0x0001D2, 0x0055CE, 0x00A5CA, 0x00C699, 0x00C247, 0x07BF00];
+      f = (function(_this) {
+        return function(node, depth) {
+          var bd, bh, bw, c, _i, _len, _ref, _results;
+          bw = log2(fw / (node.max_x - node.min_x));
+          bh = log2(fh / (node.max_y - node.min_y));
+          bd = log2(fd / (node.max_z - node.min_z));
+          if (_this.options.swap_yz) {
+            _this.add_block_by_bounds(node.min_x + bw * 2, -(node.max_z - bd * 2), node.min_y + bh * 2, node.max_x - bw * 2, -(node.min_z + bd * 2), node.max_y - bh * 2, gradient[depth]);
+          } else {
+            _this.add_block_by_bounds(node.min_x + bw * 2, node.min_y + bh * 2, node.min_z + bd * 2, node.max_x - bw * 2, node.max_y - bh * 2, node.max_z - bd * 2, gradient[depth]);
+          }
+          _ref = node.children;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            c = _ref[_i];
+            _results.push(f(c, depth + 1));
+          }
+          return _results;
+        };
+      })(this);
       if (this.tree !== null) {
         root = this.tree;
         fw = root.max_x - root.min_x;
         fh = root.max_y - root.min_y;
         fd = root.max_z - root.min_z;
-        q = [root];
-        while (q.length > 0) {
-          node = q.pop();
-          bw = log2(fw / (node.max_x - node.min_x));
-          bh = log2(fh / (node.max_y - node.min_y));
-          bd = log2(fd / (node.max_z - node.min_z));
-          if (this.options.swap_yz) {
-            this.add_block_by_bounds(node.min_x + bw * 2, -(node.max_z - bd * 2), node.min_y + bh * 2, node.max_x - bw * 2, -(node.min_z + bd * 2), node.max_y - bh * 2);
-          } else {
-            this.add_block_by_bounds(node.min_x + bw * 2, node.min_y + bh * 2, node.min_z + bd * 2, node.max_x - bw * 2, node.max_y - bh * 2, node.max_z - bd * 2);
-          }
-          q = q.concat(node.children);
-        }
+        f(root, 0);
         return [fw, fh, fd];
       }
       return [1, 1, 1];
@@ -116,10 +125,10 @@
       return this.colours[this.last_colour];
     };
 
-    Main.prototype.add_block = function(x, y, z, w, h, d) {
+    Main.prototype.add_block = function(x, y, z, w, h, d, color) {
       var g1, g2, material, rcol, side1, side2, tmp;
       tmp = new THREE.BoxGeometry(w, h, d);
-      rcol = this.next_colour();
+      rcol = color || this.next_colour();
       material = new THREE.LineBasicMaterial({
         color: rcol
       });
@@ -149,16 +158,18 @@
       return this.scene.add(side2);
     };
 
-    Main.prototype.add_block_by_bounds = function(sx, sy, sz, ex, ey, ez) {
-      return this.add_block((sx + ex) / 2, (sy + ey) / 2, (sz + ez) / 2, ex - sx, ey - sy, ez - sz);
+    Main.prototype.add_block_by_bounds = function(sx, sy, sz, ex, ey, ez, colour) {
+      return this.add_block((sx + ex) / 2, (sy + ey) / 2, (sz + ez) / 2, ex - sx, ey - sy, ez - sz, colour);
     };
 
     Main.prototype.fill_stats = function() {
-      var add_stat, count, f, leaves, levels, target;
+      var add_stat, count, f, largest_leaf_size, leaves, levels, smallest_leaf_size, target;
       target = $('#stats_target');
       count = 0;
       leaves = 0;
       levels = 0;
+      smallest_leaf_size = 99999999999;
+      largest_leaf_size = 0;
       f = (function(_this) {
         return function(n, depth) {
           var c, _i, _len, _ref, _results;
@@ -174,7 +185,13 @@
           } else {
             leaves += 1;
             if (depth > levels) {
-              return levels = depth;
+              levels = depth;
+            }
+            if (n.num_faces < smallest_leaf_size) {
+              smallest_leaf_size = n.num_faces;
+            }
+            if (n.num_faces > largest_leaf_size) {
+              return largest_leaf_size = n.num_faces;
             }
           }
         };
@@ -191,7 +208,9 @@
       })(this);
       add_stat('Nodes', count);
       add_stat('Leaf Nodes', leaves);
-      return add_stat('Depth', levels);
+      add_stat('Depth', levels);
+      add_stat('Biggest leaf (#faces)', largest_leaf_size);
+      return add_stat('Smallest leaf (#faces)', smallest_leaf_size);
     };
 
     return Main;

@@ -75,40 +75,43 @@ class Main
 		@render()
 
 	build_scene: ->
+
+		gradient = [0xE50400,0xE10056,0xDD00AE,0xAF00D9,0x5500D5,0x0001D2,0x0055CE,0x00A5CA,0x00C699,0x00C247,0x07BF00]
+
+		f = (node, depth) =>
+			bw = log2 fw / (node.max_x - node.min_x)
+			bh = log2 fh / (node.max_y - node.min_y)
+			bd = log2 fd / (node.max_z - node.min_z)
+			if @options.swap_yz
+				@add_block_by_bounds(
+					node.min_x + bw * 2
+					-(node.max_z - bd * 2)
+					node.min_y + bh * 2
+					node.max_x - bw * 2
+					-(node.min_z + bd * 2)
+					node.max_y - bh * 2
+					gradient[depth]
+				)
+			else
+				@add_block_by_bounds(
+					node.min_x + bw * 2
+					node.min_y + bh * 2
+					node.min_z + bd * 2
+					node.max_x - bw * 2
+					node.max_y - bh * 2
+					node.max_z - bd * 2
+					gradient[depth]
+				)
+
+			for c in node.children
+				f(c, depth+1)
+
 		if @tree != null
 			root = @tree
 			fw = root.max_x - root.min_x
 			fh = root.max_y - root.min_y
 			fd = root.max_z - root.min_z
-
-			q = [root]
-			while q.length > 0
-				node = q.pop()
-				bw = log2 fw / (node.max_x - node.min_x)
-				bh = log2 fh / (node.max_y - node.min_y)
-				bd = log2 fd / (node.max_z - node.min_z)
-
-				if @options.swap_yz
-					@add_block_by_bounds(
-						node.min_x + bw * 2
-						-(node.max_z - bd * 2)
-						node.min_y + bh * 2
-						node.max_x - bw * 2
-						-(node.min_z + bd * 2)
-						node.max_y - bh * 2
-					)
-				else
-					@add_block_by_bounds(
-						node.min_x + bw * 2
-						node.min_y + bh * 2
-						node.min_z + bd * 2
-						node.max_x - bw * 2
-						node.max_y - bh * 2
-						node.max_z - bd * 2
-					)
-
-				q = q.concat(node.children)
-
+			f(root, 0)
 			return [fw, fh, fd]
 		return [1, 1, 1]
 
@@ -116,9 +119,9 @@ class Main
 		@last_colour = (@last_colour + 1) % @colours.length
 		@colours[@last_colour]
 
-	add_block: (x, y, z, w, h, d) ->
+	add_block: (x, y, z, w, h, d, color) ->
 		tmp = new THREE.BoxGeometry w, h, d
-		rcol = @next_colour()
+		rcol = color || @next_colour()
 		material = new THREE.LineBasicMaterial {color: rcol}
 
 		g1 = new THREE.Geometry()
@@ -149,7 +152,7 @@ class Main
 		side2.position.set x, y, z
 		@scene.add side2
 
-	add_block_by_bounds: (sx, sy, sz, ex, ey, ez) ->
+	add_block_by_bounds: (sx, sy, sz, ex, ey, ez, colour) ->
 		@add_block(
 			(sx + ex) / 2
 			(sy + ey) / 2
@@ -157,6 +160,7 @@ class Main
 			ex-sx
 			ey-sy
 			ez-sz
+			colour
 		)
 
 	fill_stats: ->
@@ -164,6 +168,8 @@ class Main
 		count = 0
 		leaves = 0
 		levels = 0
+		smallest_leaf_size = 99999999999
+		largest_leaf_size = 0
 
 		f = (n, depth) =>
 			count += 1
@@ -174,6 +180,10 @@ class Main
 				leaves += 1
 				if depth > levels
 					levels = depth
+				if n.num_faces < smallest_leaf_size
+					smallest_leaf_size = n.num_faces
+				if n.num_faces > largest_leaf_size
+					largest_leaf_size = n.num_faces
 
 		f(@tree, 1)
 
@@ -186,6 +196,8 @@ class Main
 		add_stat 'Nodes', count
 		add_stat 'Leaf Nodes', leaves
 		add_stat 'Depth', levels
+		add_stat 'Biggest leaf (#faces)', largest_leaf_size
+		add_stat 'Smallest leaf (#faces)', smallest_leaf_size
 
 build_tree = (obj_array) ->
 	root = null
