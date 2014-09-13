@@ -39,7 +39,9 @@
       this.animate = __bind(this.animate, this);
       var cam_pos, viewport_height, viewport_width;
       this.options = $.extend({
-        swap_yz: false
+        swap_yz: false,
+        random_colours: false,
+        margins: false
       }, options || {});
       this.tree = tree;
       this.scene = new THREE.Scene();
@@ -91,15 +93,26 @@
       gradient = [0xE50400, 0xE10056, 0xDD00AE, 0xAF00D9, 0x5500D5, 0x0001D2, 0x0055CE, 0x00A5CA, 0x00C699, 0x00C247, 0x07BF00];
       f = (function(_this) {
         return function(node, depth) {
-          var bd, bh, bw, c, _i, _len, _ref, _results;
-          bw = log2(fw / (node.max_x - node.min_x));
-          bh = log2(fh / (node.max_y - node.min_y));
-          bd = log2(fd / (node.max_z - node.min_z));
+          var a, b, c, colour, d, ex, ey, ez, margin, sx, sy, sz, _i, _len, _ref, _results;
+          margin = _this.options.margins ? depth : 0;
+          sx = node.min_x + margin;
+          sy = node.min_y + margin;
+          sz = node.min_z + margin;
+          ex = node.max_x - margin;
+          ey = node.max_y - margin;
+          ez = node.max_z - margin;
           if (_this.options.swap_yz) {
-            _this.add_block_by_bounds(node.min_x + bw * 2, -(node.max_z - bd * 2), node.min_y + bh * 2, node.max_x - bw * 2, -(node.min_z + bd * 2), node.max_y - bh * 2, gradient[depth]);
-          } else {
-            _this.add_block_by_bounds(node.min_x + bw * 2, node.min_y + bh * 2, node.min_z + bd * 2, node.max_x - bw * 2, node.max_y - bh * 2, node.max_z - bd * 2, gradient[depth]);
+            a = -ez;
+            b = -sz;
+            c = sy;
+            d = ey;
+            sy = a;
+            sz = c;
+            ey = b;
+            ez = d;
           }
+          colour = _this.options.random_colours ? _this.next_colour() : gradient[depth];
+          _this.add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour);
           _ref = node.children;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -233,6 +246,7 @@
       } else {
         p = blocks[o.parent_id];
         p.children.push(t);
+        t.parent = p;
       }
     }
     return root;
@@ -240,16 +254,17 @@
 
   $(function() {
     $('#button1').click(function() {
-      var main, o, t, tree, v;
+      var main, o, t, tree;
       o = JSON.parse($('#textarea1')[0].value);
       tree = build_tree(o);
-      v = $('#checkbox1')[0].checked;
       t = $('#canvas_target')[0];
       $('.interface_2_row').css('display', 'block');
-      $('#interface1').remove();
-      return main = new Main(t, tree, {
-        swap_yz: v
+      main = new Main(t, tree, {
+        swap_yz: ($('#checkbox1')[0]).checked,
+        random_colours: ($('#checkbox2')[0]).checked,
+        margins: ($('#checkbox3')[0]).checked
       });
+      return $('#interface1').remove();
     });
     return $('#button2').click(function() {
       return $.ajax('sample.json', {

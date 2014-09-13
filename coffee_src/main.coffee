@@ -26,6 +26,8 @@ class Main
 		@options = $.extend(
 			{
 				swap_yz: false
+				random_colours: false
+				margins: false
 			}
 			options || {}
 		)
@@ -79,29 +81,29 @@ class Main
 		gradient = [0xE50400,0xE10056,0xDD00AE,0xAF00D9,0x5500D5,0x0001D2,0x0055CE,0x00A5CA,0x00C699,0x00C247,0x07BF00]
 
 		f = (node, depth) =>
-			bw = log2 fw / (node.max_x - node.min_x)
-			bh = log2 fh / (node.max_y - node.min_y)
-			bd = log2 fd / (node.max_z - node.min_z)
+
+			margin = if @options.margins then depth else 0
+
+			sx = node.min_x + margin
+			sy = node.min_y + margin
+			sz = node.min_z + margin
+			ex = node.max_x - margin
+			ey = node.max_y - margin
+			ez = node.max_z - margin
+
 			if @options.swap_yz
-				@add_block_by_bounds(
-					node.min_x + bw * 2
-					-(node.max_z - bd * 2)
-					node.min_y + bh * 2
-					node.max_x - bw * 2
-					-(node.min_z + bd * 2)
-					node.max_y - bh * 2
-					gradient[depth]
-				)
-			else
-				@add_block_by_bounds(
-					node.min_x + bw * 2
-					node.min_y + bh * 2
-					node.min_z + bd * 2
-					node.max_x - bw * 2
-					node.max_y - bh * 2
-					node.max_z - bd * 2
-					gradient[depth]
-				)
+				a = -ez
+				b = -sz
+				c = sy
+				d = ey
+				sy = a
+				sz = c
+				ey = b
+				ez = d
+
+			colour = if  @options.random_colours then @next_colour() else gradient[depth]
+
+			@add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour)
 
 			for c in node.children
 				f(c, depth+1)
@@ -212,17 +214,21 @@ build_tree = (obj_array) ->
 		else
 			p = blocks[o.parent_id]
 			p.children.push(t)
+			t.parent = p
 	root
 
 $ ->
 	$('#button1').click ->
 		o = JSON.parse $('#textarea1')[0].value
 		tree = build_tree o
-		v = $('#checkbox1')[0].checked
 		t = $('#canvas_target')[0]
 		$('.interface_2_row').css 'display', 'block'
+		main = new Main t, tree, {
+			swap_yz: ($('#checkbox1')[0]).checked
+			random_colours: ($('#checkbox2')[0]).checked
+			margins: ($('#checkbox3')[0]).checked
+		}
 		$('#interface1').remove()
-		main = new Main t, tree, {swap_yz: v}
 
 	$('#button2').click ->
 		$.ajax 'sample.json', 
