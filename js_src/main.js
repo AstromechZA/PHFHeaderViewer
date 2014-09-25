@@ -203,10 +203,10 @@
             if (depth > levels) {
               levels = depth;
             }
-            if (n.num_faces < smallest_leaf_size) {
+            if (n.num_vertices < smallest_leaf_size) {
               smallest_leaf_size = n.num_faces;
             }
-            if (n.num_faces > largest_leaf_size) {
+            if (n.num_vertices > largest_leaf_size) {
               return largest_leaf_size = n.num_faces;
             }
           }
@@ -225,8 +225,8 @@
       add_stat('Nodes', count);
       add_stat('Leaf Nodes', leaves);
       add_stat('Depth', levels);
-      add_stat('Biggest leaf (#faces)', largest_leaf_size);
-      return add_stat('Smallest leaf (#faces)', smallest_leaf_size);
+      add_stat('Biggest leaf (#vertices)', largest_leaf_size);
+      return add_stat('Smallest leaf (#vertices)', smallest_leaf_size);
     };
 
     return Main;
