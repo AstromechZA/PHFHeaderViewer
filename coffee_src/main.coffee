@@ -28,6 +28,7 @@ class Main
 				swap_yz: false
 				random_colours: false
 				margins: false
+				only_leaves: false
 			}
 			options || {}
 		)
@@ -82,28 +83,30 @@ class Main
 
 		f = (node, depth) =>
 
-			margin = if @options.margins then depth else 0
+			if (not @options.only_leaves) or node.children.length == 0 
 
-			sx = node.min_x + margin
-			sy = node.min_y + margin
-			sz = node.min_z + margin
-			ex = node.max_x - margin
-			ey = node.max_y - margin
-			ez = node.max_z - margin
+				margin = if @options.margins then depth else 0
 
-			if @options.swap_yz
-				a = -ez
-				b = -sz
-				c = sy
-				d = ey
-				sy = a
-				sz = c
-				ey = b
-				ez = d
+				sx = node.min_x + margin
+				sy = node.min_y + margin
+				sz = node.min_z + margin
+				ex = node.max_x - margin
+				ey = node.max_y - margin
+				ez = node.max_z - margin
 
-			colour = if  @options.random_colours then @next_colour() else gradient[depth]
+				if @options.swap_yz
+					a = -ez
+					b = -sz
+					c = sy
+					d = ey
+					sy = a
+					sz = c
+					ey = b
+					ez = d
 
-			@add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour)
+				colour = if  @options.random_colours then @next_colour() else gradient[depth]
+
+				@add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour)
 
 			for c in node.children
 				f(c, depth+1)
@@ -227,6 +230,7 @@ $ ->
 			swap_yz: ($('#checkbox1')[0]).checked
 			random_colours: ($('#checkbox2')[0]).checked
 			margins: ($('#checkbox3')[0]).checked
+			only_leaves: ($('#checkbox4')[0]).checked
 		}
 		$('#interface1').remove()
 

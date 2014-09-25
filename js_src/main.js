@@ -41,7 +41,8 @@
       this.options = $.extend({
         swap_yz: false,
         random_colours: false,
-        margins: false
+        margins: false,
+        only_leaves: false
       }, options || {});
       this.tree = tree;
       this.scene = new THREE.Scene();
@@ -94,25 +95,27 @@
       f = (function(_this) {
         return function(node, depth) {
           var a, b, c, colour, d, ex, ey, ez, margin, sx, sy, sz, _i, _len, _ref, _results;
-          margin = _this.options.margins ? depth : 0;
-          sx = node.min_x + margin;
-          sy = node.min_y + margin;
-          sz = node.min_z + margin;
-          ex = node.max_x - margin;
-          ey = node.max_y - margin;
-          ez = node.max_z - margin;
-          if (_this.options.swap_yz) {
-            a = -ez;
-            b = -sz;
-            c = sy;
-            d = ey;
-            sy = a;
-            sz = c;
-            ey = b;
-            ez = d;
+          if ((!_this.options.only_leaves) || node.children.length === 0) {
+            margin = _this.options.margins ? depth : 0;
+            sx = node.min_x + margin;
+            sy = node.min_y + margin;
+            sz = node.min_z + margin;
+            ex = node.max_x - margin;
+            ey = node.max_y - margin;
+            ez = node.max_z - margin;
+            if (_this.options.swap_yz) {
+              a = -ez;
+              b = -sz;
+              c = sy;
+              d = ey;
+              sy = a;
+              sz = c;
+              ey = b;
+              ez = d;
+            }
+            colour = _this.options.random_colours ? _this.next_colour() : gradient[depth];
+            _this.add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour);
           }
-          colour = _this.options.random_colours ? _this.next_colour() : gradient[depth];
-          _this.add_block_by_bounds(sx, sy, sz, ex, ey, ez, colour);
           _ref = node.children;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -262,7 +265,8 @@
       main = new Main(t, tree, {
         swap_yz: ($('#checkbox1')[0]).checked,
         random_colours: ($('#checkbox2')[0]).checked,
-        margins: ($('#checkbox3')[0]).checked
+        margins: ($('#checkbox3')[0]).checked,
+        only_leaves: ($('#checkbox4')[0]).checked
       });
       return $('#interface1').remove();
     });
