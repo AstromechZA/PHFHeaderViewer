@@ -234,15 +234,17 @@
   })();
 
   build_tree = function(obj_array) {
-    var blocks, o, p, root, t, _i, _j, _len, _len1;
+    var blocks, o, p, root, t, _i, _j, _len, _len1, _ref, _ref1;
     root = null;
     blocks = {};
-    for (_i = 0, _len = obj_array.length; _i < _len; _i++) {
-      o = obj_array[_i];
+    _ref = obj_array.nodes;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      o = _ref[_i];
       blocks[o.id] = new Block(o);
     }
-    for (_j = 0, _len1 = obj_array.length; _j < _len1; _j++) {
-      o = obj_array[_j];
+    _ref1 = obj_array.nodes;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      o = _ref1[_j];
       t = blocks[o.id];
       if (o.parent_id === null) {
         root = t;

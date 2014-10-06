@@ -207,10 +207,10 @@ class Main
 build_tree = (obj_array) ->
 	root = null
 	blocks = {}
-	for o in obj_array
+	for o in obj_array.nodes
 		blocks[o.id] = new Block o
 
-	for o in obj_array
+	for o in obj_array.nodes
 		t = blocks[o.id]
 		if o.parent_id == null
 			root = t
